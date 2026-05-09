@@ -1,0 +1,14 @@
+node_modules/
+.env
+*.log
+logs/
+dist/
+build/
+coverage/
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+*.local
+docker-compose.override.yml
