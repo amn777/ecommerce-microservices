@@ -1,0 +1,355 @@
+databases:
+  # ─────────────────────────────────────────────
+  # PostgreSQL Databases (1 per service)
+  # ─────────────────────────────────────────────
+  - name: postgres-user
+    databaseName: users_db
+    user: postgres
+    plan: free
+
+  - name: postgres-product
+    databaseName: products_db
+    user: postgres
+    plan: free
+
+  - name: postgres-order
+    databaseName: orders_db
+    user: postgres
+    plan: free
+
+  - name: postgres-payment
+    databaseName: payments_db
+    user: postgres
+    plan: free
+
+services:
+  # ─────────────────────────────────────────────
+  # REDIS
+  # ─────────────────────────────────────────────
+  - type: redis
+    name: ecommerce-redis
+    plan: free
+    ipAllowList: []
+
+  # ─────────────────────────────────────────────
+  # USER SERVICE
+  # ─────────────────────────────────────────────
+  - type: web
+    name: user-service
+    runtime: docker
+    dockerfilePath: ./services/user-service/Dockerfile
+    dockerContext: ./services/user-service
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DB_HOST
+        fromDatabase:
+          name: postgres-user
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: postgres-user
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: postgres-user
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: postgres-user
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: postgres-user
+          property: password
+      - key: REDIS_HOST
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: port
+      - key: REDIS_PASSWORD
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: password
+      - key: KAFKA_BROKERS
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 7d
+
+  # ─────────────────────────────────────────────
+  # PRODUCT SERVICE
+  # ─────────────────────────────────────────────
+  - type: web
+    name: product-service
+    runtime: docker
+    dockerfilePath: ./services/product-service/Dockerfile
+    dockerContext: ./services/product-service
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3002
+      - key: DB_HOST
+        fromDatabase:
+          name: postgres-product
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: postgres-product
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: postgres-product
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: postgres-product
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: postgres-product
+          property: password
+      - key: REDIS_HOST
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: port
+      - key: REDIS_PASSWORD
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: password
+      - key: KAFKA_BROKERS
+        sync: false
+
+  # ─────────────────────────────────────────────
+  # ORDER SERVICE
+  # ─────────────────────────────────────────────
+  - type: web
+    name: order-service
+    runtime: docker
+    dockerfilePath: ./services/order-service/Dockerfile
+    dockerContext: ./services/order-service
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3003
+      - key: DB_HOST
+        fromDatabase:
+          name: postgres-order
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: postgres-order
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: postgres-order
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: postgres-order
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: postgres-order
+          property: password
+      - key: REDIS_HOST
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: port
+      - key: REDIS_PASSWORD
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: password
+      - key: KAFKA_BROKERS
+        sync: false
+      - key: PRODUCT_SERVICE_URL
+        fromService:
+          name: product-service
+          type: web
+          property: url
+
+  # ─────────────────────────────────────────────
+  # PAYMENT SERVICE
+  # ─────────────────────────────────────────────
+  - type: web
+    name: payment-service
+    runtime: docker
+    dockerfilePath: ./services/payment-service/Dockerfile
+    dockerContext: ./services/payment-service
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3004
+      - key: DB_HOST
+        fromDatabase:
+          name: postgres-payment
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: postgres-payment
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: postgres-payment
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: postgres-payment
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: postgres-payment
+          property: password
+      - key: REDIS_HOST
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: port
+      - key: REDIS_PASSWORD
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: password
+      - key: KAFKA_BROKERS
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+
+  # ─────────────────────────────────────────────
+  # NOTIFICATION SERVICE
+  # ─────────────────────────────────────────────
+  - type: worker
+    name: notification-service
+    runtime: docker
+    dockerfilePath: ./services/notification-service/Dockerfile
+    dockerContext: ./services/notification-service
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3005
+      - key: REDIS_HOST
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: port
+      - key: REDIS_PASSWORD
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: password
+      - key: KAFKA_BROKERS
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+
+  # ─────────────────────────────────────────────
+  # API GATEWAY (Main Entry Point)
+  # ─────────────────────────────────────────────
+  - type: web
+    name: api-gateway
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: USER_SERVICE_URL
+        fromService:
+          name: user-service
+          type: web
+          property: url
+      - key: PRODUCT_SERVICE_URL
+        fromService:
+          name: product-service
+          type: web
+          property: url
+      - key: ORDER_SERVICE_URL
+        fromService:
+          name: order-service
+          type: web
+          property: url
+      - key: PAYMENT_SERVICE_URL
+        fromService:
+          name: payment-service
+          type: web
+          property: url
+      - key: NOTIFICATION_SERVICE_URL
+        fromService:
+          name: notification-service
+          type: worker
+          property: url
+      - key: REDIS_HOST
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: port
+      - key: REDIS_PASSWORD
+        fromService:
+          name: ecommerce-redis
+          type: redis
+          property: password
+      - key: JWT_SECRET
+        sync: false
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: RATE_LIMIT_MAX
+        value: 100
