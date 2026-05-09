@@ -1,13 +1,10 @@
-FROM node:20-alpine AS base
+FROM node:20-alpine
 WORKDIR /app
 RUN apk add --no-cache wget
 
-FROM base AS deps
 COPY api-gateway/package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm install --only=production
 
-FROM base AS final
-COPY --from=deps /app/node_modules ./node_modules
 COPY api-gateway/ .
 RUN mkdir -p logs
 
