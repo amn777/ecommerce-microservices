@@ -16,17 +16,11 @@ databases:
     plan: free
 
 services:
-  # ─────────────────────────────────────────────
-  # REDIS
-  # ─────────────────────────────────────────────
   - type: redis
     name: ecommerce-redis
     plan: free
     ipAllowList: []
 
-  # ─────────────────────────────────────────────
-  # USER SERVICE
-  # ─────────────────────────────────────────────
   - type: web
     name: user-service
     runtime: docker
@@ -71,9 +65,6 @@ services:
       - key: JWT_EXPIRES_IN
         value: 7d
 
-  # ─────────────────────────────────────────────
-  # PRODUCT SERVICE
-  # ─────────────────────────────────────────────
   - type: web
     name: product-service
     runtime: docker
@@ -114,9 +105,6 @@ services:
       - key: KAFKA_BROKERS
         sync: false
 
-  # ─────────────────────────────────────────────
-  # ORDER SERVICE
-  # ─────────────────────────────────────────────
   - type: web
     name: order-service
     runtime: docker
@@ -160,11 +148,8 @@ services:
         fromService:
           name: product-service
           type: web
-          property: url
+          property: host
 
-  # ─────────────────────────────────────────────
-  # PAYMENT SERVICE
-  # ─────────────────────────────────────────────
   - type: web
     name: payment-service
     runtime: docker
@@ -207,9 +192,6 @@ services:
       - key: STRIPE_SECRET_KEY
         sync: false
 
-  # ─────────────────────────────────────────────
-  # NOTIFICATION SERVICE
-  # ─────────────────────────────────────────────
   - type: worker
     name: notification-service
     runtime: docker
@@ -235,9 +217,6 @@ services:
       - key: SMTP_PASS
         sync: false
 
-  # ─────────────────────────────────────────────
-  # API GATEWAY
-  # ─────────────────────────────────────────────
   - type: web
     name: api-gateway
     runtime: docker
@@ -254,22 +233,22 @@ services:
         fromService:
           name: user-service
           type: web
-          property: url
+          property: host
       - key: PRODUCT_SERVICE_URL
         fromService:
           name: product-service
           type: web
-          property: url
+          property: host
       - key: ORDER_SERVICE_URL
         fromService:
           name: order-service
           type: web
-          property: url
+          property: host
       - key: PAYMENT_SERVICE_URL
         fromService:
           name: payment-service
           type: web
-          property: url
+          property: host
       - key: REDIS_URL
         fromService:
           name: ecommerce-redis
