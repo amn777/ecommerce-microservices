@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ecommerce Ops</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Microservice Commerce</p>
+        <h1>Ecommerce Ops</h1>
+      </div>
+      <nav class="top-actions" aria-label="Dashboards">
+        <a href="/health" target="_blank" rel="noreferrer">API</a>
+        <a href="http://localhost:8090" target="_blank" rel="noreferrer">Kafka</a>
+        <a href="http://localhost:8091" target="_blank" rel="noreferrer">Redis</a>
+      </nav>
+    </header>
+
+    <main class="shell">
+      <section class="status-grid" aria-label="Service status">
+        <article class="metric">
+          <span class="metric-label">Gateway</span>
+          <strong id="gatewayStatus">Checking</strong>
+        </article>
+        <article class="metric">
+          <span class="metric-label">Products</span>
+          <strong id="productCount">0</strong>
+        </article>
+        <article class="metric">
+          <span class="metric-label">Session</span>
+          <strong id="sessionStatus">Guest</strong>
+        </article>
+        <article class="metric">
+          <span class="metric-label">Last Sync</span>
+          <strong id="lastSync">--</strong>
+        </article>
+      </section>
+
+      <section class="workspace">
+        <aside class="side-panel">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Account</h2>
+              <button class="icon-button" id="logoutBtn" title="Clear session" aria-label="Clear session">X</button>
+            </div>
+            <form id="authForm" class="stack">
+              <div class="split">
+                <label>
+                  First name
+                  <input name="firstName" value="Aman" autocomplete="given-name" />
+                </label>
+                <label>
+                  Last name
+                  <input name="lastName" value="Singh" autocomplete="family-name" />
+                </label>
+              </div>
+              <label>
+                Email
+                <input name="email" type="email" autocomplete="email" />
+              </label>
+              <label>
+                Password
+                <input name="password" type="password" value="SecurePass123" autocomplete="current-password" />
+              </label>
+              <div class="button-row">
+                <button type="submit" name="action" value="register">Register</button>
+                <button type="submit" name="action" value="login" class="secondary">Login</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Create Product</h2>
+            </div>
+            <form id="productForm" class="stack">
+              <label>
+                Name
+                <input name="name" value="Everyday Cotton Tee" required />
+              </label>
+              <div class="split">
+                <label>
+                  Price
+                  <input name="price" type="number" min="0" step="0.01" value="799" required />
+                </label>
+                <label>
+                  Stock
+                  <input name="stock" type="number" min="0" step="1" value="24" />
+                </label>
+              </div>
+              <div class="split">
+                <label>
+                  SKU
+                  <input name="sku" required />
+                </label>
+                <label>
+                  Category
+                  <input name="category" value="Apparel" required />
+                </label>
+              </div>
+              <label>
+                Brand
+                <input name="brand" value="Myntra Lab" />
+              </label>
+              <label>
+                Description
+                <textarea name="description" rows="3">Soft daily wear tee with a clean fit.</textarea>
+              </label>
+              <label class="checkline">
+                <input name="isFeatured" type="checkbox" checked />
+                Featured
+              </label>
+              <button type="submit">Add Product</button>
+            </form>
+          </section>
+        </aside>
+
+        <section class="main-panel">
+          <div class="toolbar">
+            <div>
+              <h2>Catalog</h2>
+              <p id="catalogSubtext">Live data from product-service</p>
+            </div>
+            <div class="filters">
+              <input id="searchInput" placeholder="Search products" />
+              <select id="categoryFilter" aria-label="Filter by category">
+                <option value="">All categories</option>
+              </select>
+              <button id="refreshBtn" class="secondary" title="Refresh catalog">Refresh</button>
+            </div>
+          </div>
+          <div id="message" class="message" role="status"></div>
+          <div id="productsGrid" class="products-grid" aria-live="polite"></div>
+        </section>
+      </section>
+    </main>
+
+    <template id="productCardTemplate">
+      <article class="product-card">
+        <div class="product-top">
+          <div>
+            <h3></h3>
+            <p class="muted product-meta"></p>
+          </div>
+          <span class="badge"></span>
+        </div>
+        <p class="description"></p>
+        <div class="product-foot">
+          <strong class="price"></strong>
+          <span class="stock"></span>
+        </div>
+      </article>
+    </template>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
