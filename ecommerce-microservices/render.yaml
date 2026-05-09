@@ -1,25 +1,18 @@
 databases:
-  # ─────────────────────────────────────────────
-  # PostgreSQL Databases (1 per service)
-  # ─────────────────────────────────────────────
   - name: postgres-user
     databaseName: users_db
-    user: postgres
     plan: free
 
   - name: postgres-product
     databaseName: products_db
-    user: postgres
     plan: free
 
   - name: postgres-order
     databaseName: orders_db
-    user: postgres
     plan: free
 
   - name: postgres-payment
     databaseName: payments_db
-    user: postgres
     plan: free
 
 services:
@@ -37,8 +30,8 @@ services:
   - type: web
     name: user-service
     runtime: docker
-    dockerfilePath: ./services/user-service/Dockerfile
-    dockerContext: ./services/user-service
+    dockerfilePath: ./ecommerce-microservices/services/user-service/Dockerfile
+    dockerContext: ./ecommerce-microservices/services/user-service
     plan: free
     healthCheckPath: /health
     envVars:
@@ -66,21 +59,11 @@ services:
         fromDatabase:
           name: postgres-user
           property: password
-      - key: REDIS_HOST
+      - key: REDIS_URL
         fromService:
           name: ecommerce-redis
           type: redis
-          property: host
-      - key: REDIS_PORT
-        fromService:
-          name: ecommerce-redis
-          type: redis
-          property: port
-      - key: REDIS_PASSWORD
-        fromService:
-          name: ecommerce-redis
-          type: redis
-          property: password
+          property: connectionString
       - key: KAFKA_BROKERS
         sync: false
       - key: JWT_SECRET
@@ -94,8 +77,8 @@ services:
   - type: web
     name: product-service
     runtime: docker
-    dockerfilePath: ./services/product-service/Dockerfile
-    dockerContext: ./services/product-service
+    dockerfilePath: ./ecommerce-microservices/services/product-service/Dockerfile
+    dockerContext: ./ecommerce-microservices/services/product-service
     plan: free
     healthCheckPath: /health
     envVars:
@@ -123,21 +106,11 @@ services:
         fromDatabase:
           name: postgres-product
           property: password
-      - key: REDIS_HOST
+      - key: REDIS_URL
         fromService:
           name: ecommerce-redis
           type: redis
-          property: host
-      - key: REDIS_PORT
-        fromService:
-          name: ecommerce-redis
-          type: redis
-          property: port
-      - key: REDIS_PASSWORD
-        fromService:
-          name: ecommerce-redis
-          type: redis
-          property: password
+          property: connectionString
       - key: KAFKA_BROKERS
         sync: false
 
@@ -147,8 +120,8 @@ services:
   - type: web
     name: order-service
     runtime: docker
-    dockerfilePath: ./services/order-service/Dockerfile
-    dockerContext: ./services/order-service
+    dockerfilePath: ./ecommerce-microservices/services/order-service/Dockerfile
+    dockerContext: ./ecommerce-microservices/services/order-service
     plan: free
     healthCheckPath: /health
     envVars:
@@ -176,21 +149,11 @@ services:
         fromDatabase:
           name: postgres-order
           property: password
-      - key: REDIS_HOST
+      - key: REDIS_URL
         fromService:
           name: ecommerce-redis
           type: redis
-          property: host
-      - key: REDIS_PORT
-        fromService:
-          name: ecommerce-redis
-          type: redis
-          property: port
-      - key: REDIS_PASSWORD
-        fromService:
-          name: ecommerce-redis
-          type: redis
-          property: password
+          property: connectionString
       - key: KAFKA_BROKERS
         sync: false
       - key: PRODUCT_SERVICE_URL
@@ -205,8 +168,8 @@ services:
   - type: web
     name: payment-service
     runtime: docker
-    dockerfilePath: ./services/payment-service/Dockerfile
-    dockerContext: ./services/payment-service
+    dockerfilePath: ./ecommerce-microservices/services/payment-service/Dockerfile
+    dockerContext: ./ecommerce-microservices/services/payment-service
     plan: free
     healthCheckPath: /health
     envVars:
@@ -234,21 +197,11 @@ services:
         fromDatabase:
           name: postgres-payment
           property: password
-      - key: REDIS_HOST
+      - key: REDIS_URL
         fromService:
           name: ecommerce-redis
           type: redis
-          property: host
-      - key: REDIS_PORT
-        fromService:
-          name: ecommerce-redis
-          type: redis
-          property: port
-      - key: REDIS_PASSWORD
-        fromService:
-          name: ecommerce-redis
-          type: redis
-          property: password
+          property: connectionString
       - key: KAFKA_BROKERS
         sync: false
       - key: STRIPE_SECRET_KEY
@@ -260,29 +213,19 @@ services:
   - type: worker
     name: notification-service
     runtime: docker
-    dockerfilePath: ./services/notification-service/Dockerfile
-    dockerContext: ./services/notification-service
+    dockerfilePath: ./ecommerce-microservices/services/notification-service/Dockerfile
+    dockerContext: ./ecommerce-microservices/services/notification-service
     plan: free
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 3005
-      - key: REDIS_HOST
+      - key: REDIS_URL
         fromService:
           name: ecommerce-redis
           type: redis
-          property: host
-      - key: REDIS_PORT
-        fromService:
-          name: ecommerce-redis
-          type: redis
-          property: port
-      - key: REDIS_PASSWORD
-        fromService:
-          name: ecommerce-redis
-          type: redis
-          property: password
+          property: connectionString
       - key: KAFKA_BROKERS
         sync: false
       - key: SMTP_HOST
@@ -293,12 +236,12 @@ services:
         sync: false
 
   # ─────────────────────────────────────────────
-  # API GATEWAY (Main Entry Point)
+  # API GATEWAY
   # ─────────────────────────────────────────────
   - type: web
     name: api-gateway
     runtime: docker
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./ecommerce-microservices/Dockerfile
     dockerContext: .
     plan: free
     healthCheckPath: /health
@@ -327,26 +270,11 @@ services:
           name: payment-service
           type: web
           property: url
-      - key: NOTIFICATION_SERVICE_URL
-        fromService:
-          name: notification-service
-          type: worker
-          property: url
-      - key: REDIS_HOST
+      - key: REDIS_URL
         fromService:
           name: ecommerce-redis
           type: redis
-          property: host
-      - key: REDIS_PORT
-        fromService:
-          name: ecommerce-redis
-          type: redis
-          property: port
-      - key: REDIS_PASSWORD
-        fromService:
-          name: ecommerce-redis
-          type: redis
-          property: password
+          property: connectionString
       - key: JWT_SECRET
         sync: false
       - key: RATE_LIMIT_WINDOW_MS
